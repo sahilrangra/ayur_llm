@@ -1,5 +1,10 @@
 import requests
 import streamlit as st
+import streamlit as st
+
+st.set_page_config(page_title="Ayurvedic LLM")
+st.write("🚀 Ayurvedic LLM starting...")
+
 
 API_BASE = "http://127.0.0.1:8000"
 
