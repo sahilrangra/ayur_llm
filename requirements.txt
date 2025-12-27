@@ -1,0 +1,21 @@
+# Core / utilities
+python-dotenv==1.0.1
+tqdm==4.66.5
+requests==2.32.5
+regex==2024.7.24
+
+# PDF extraction
+pymupdf==1.24.9
+
+# Vector DB (Chroma)
+chromadb==0.5.23
+
+# OpenAI SDK
+openai>=1.40.0
+
+# Backend API (FastAPI)
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+
+# UI
+streamlit==1.52.2

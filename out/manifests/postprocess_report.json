@@ -1,0 +1,51 @@
+[
+  {
+    "in": "out\\jsonl\\9789240042674_eng_0c9ecb158a.jsonl",
+    "out": "out\\jsonl_clean\\9789240042674_eng_0c9ecb158a_clean.jsonl",
+    "chunks": 94,
+    "source": "WHO",
+    "title": "WHO BENCHMARKS FOR"
+  },
+  {
+    "in": "out\\jsonl\\ayurveda_based_diet_lifestyle_guidelines_skin_diseases_31ddbf0dd1.jsonl",
+    "out": "out\\jsonl_clean\\ayurveda_based_diet_lifestyle_guidelines_skin_diseases_31ddbf0dd1_clean.jsonl",
+    "chunks": 29,
+    "source": "AYUSH/GOV",
+    "title": "Ayurveda based diet & life Style Guidelines"
+  },
+  {
+    "in": "out\\jsonl\\ayurveda_the_science_of_lifedossier_79711899e8.jsonl",
+    "out": "out\\jsonl_clean\\ayurveda_the_science_of_lifedossier_79711899e8_clean.jsonl",
+    "chunks": 140,
+    "source": "AYUSH/GOV",
+    "title": "The Science of Life"
+  },
+  {
+    "in": "out\\jsonl\\ayurvedic_home_remedies_english_0c7ec74394.jsonl",
+    "out": "out\\jsonl_clean\\ayurvedic_home_remedies_english_0c7ec74394_clean.jsonl",
+    "chunks": 30,
+    "source": "CCRAS",
+    "title": "CENTRAL COUNCIL FOR RESEARCH IN AYURVEDA AND SIDDHA"
+  },
+  {
+    "in": "out\\jsonl\\charak_samhita_d0bbb1ee2a.jsonl",
+    "out": "out\\jsonl_clean\\charak_samhita_d0bbb1ee2a_clean.jsonl",
+    "chunks": 563,
+    "source": "CLASSICAL",
+    "title": "Charaka Samhita"
+  },
+  {
+    "in": "out\\jsonl\\draft_traditional_medicine_strategy_2025_2034_9840259345.jsonl",
+    "out": "out\\jsonl_clean\\draft_traditional_medicine_strategy_2025_2034_9840259345_clean.jsonl",
+    "chunks": 52,
+    "source": "WHO",
+    "title": "Public consultation - Draft TM strategy 2025-2034 (with water mark).docx"
+  },
+  {
+    "in": "out\\jsonl\\guidelines_and_training_mannual_on_integration_of__ayurveda_in_npcdcs_0_ada59774e0.jsonl",
+    "out": "out\\jsonl_clean\\guidelines_and_training_mannual_on_integration_of__ayurveda_in_npcdcs_0_ada59774e0_clean.jsonl",
+    "chunks": 105,
+    "source": "AYUSH/GOV",
+    "title": "INTEGRATION OF AYUSH (AYURVEDA) WITH"
+  }
+]
