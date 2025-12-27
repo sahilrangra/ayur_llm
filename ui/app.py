@@ -188,7 +188,7 @@ if ask:
     '''
 
     with st.spinner("Thinking with citations..."):
-    data = ask_question(payload)
+        data = ask_question(payload)
 
     # ---- Answer card ----
     st.markdown('<div class="card">', unsafe_allow_html=True)
