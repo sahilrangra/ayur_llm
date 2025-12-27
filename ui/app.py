@@ -1,16 +1,23 @@
-#import requests
-import streamlit as st
 import streamlit as st
 
 # -----------------------------
-# Local backend replacements
+# Page config
 # -----------------------------
+st.set_page_config(
+    page_title="Ayurveda AI",
+    page_icon="🌿",
+    layout="wide",
+)
 
+st.title("🌿 Ayurveda AI")
+st.write("Ask questions **only from your documents** (RAG + citations).")
+st.markdown("⚡ Fast • Safe • Cited")
+
+# -----------------------------
+# Fake local backend (TEMP)
+# -----------------------------
+@st.cache_data(ttl=60)
 def list_docs():
-    """
-    TEMP stub.
-    Replace later with real vector DB / RAG logic.
-    """
     return [
         {
             "doc_id": "charaka_1",
@@ -26,10 +33,6 @@ def list_docs():
 
 
 def ask_question(payload):
-    """
-    TEMP stub.
-    Replace later with OpenAI + retrieval logic.
-    """
     return {
         "answer": f"(Demo answer)\n\nYou asked:\n{payload['question']}",
         "retrieved_count": 2,
@@ -46,117 +49,35 @@ def ask_question(payload):
         ],
     }
 
-
-st.set_page_config(page_title="Ayurvedic LLM")
-st.write("🚀 Ayurvedic LLM starting...")
-
-
-#API_BASE = "http://127.0.0.1:8000"
-
-st.set_page_config(
-    page_title="Ayurveda AI",
-    page_icon="🌿",
-    layout="wide",
-)
-
-# ---- Sexy CSS ----
-st.markdown(
-    """
-    <style>
-      .block-container { padding-top: 2rem; padding-bottom: 2rem; }
-      .stTextInput input { border-radius: 14px; padding: 14px; }
-      .stButton button { border-radius: 14px; padding: 12px 18px; font-weight: 700; }
-      .card {
-        border: 1px solid rgba(255,255,255,0.12);
-        background: rgba(255,255,255,0.04);
-        border-radius: 18px;
-        padding: 16px 18px;
-        margin-top: 12px;
-      }
-      .muted { opacity: 0.75; font-size: 0.92rem; }
-      .pill {
-        display: inline-block;
-        border-radius: 999px;
-        padding: 6px 10px;
-        margin-right: 6px;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.12);
-        font-size: 0.86rem;
-      }
-      code { border-radius: 10px !important; }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# ---- Header ----
-left, right = st.columns([0.7, 0.3], vertical_alignment="center")
-with left:
-    st.title("🌿 Ayurveda AI")
-    st.write("Ask questions **only from your documents** (RAG + citations).")
-with right:
-    st.markdown('<div class="card">⚡ Fast • Safe • Cited</div>', unsafe_allow_html=True)
-
-'''
-# ---- Load docs from backend ----
-@st.cache_data(ttl=60)
-def fetch_docs():
-    r = requests.get(f"{API_BASE}/list_docs", timeout=20)
-    r.raise_for_status()
-    return r.json()["docs"]
-'''
-@st.cache_data(ttl=60)
-def fetch_docs():
-    return list_docs()
-
-'''
-docs = []
-docs_error = None
-try:
-    docs = fetch_docs()
-except Exception as e:
-    docs_error = str(e)
-
-# ---- Sidebar controls ----
+# -----------------------------
+# Sidebar
+# -----------------------------
 st.sidebar.header("⚙️ Controls")
 
-if docs_error:
-    st.sidebar.error("Backend not reachable or /docs failed.")
-    st.sidebar.caption(docs_error)
-    st.stop()
-'''
+docs = list_docs()
+sources = sorted({d["source"] for d in docs})
+source_choice = st.sidebar.selectbox(
+    "Filter by Source (optional)",
+    ["ALL"] + sources,
+)
 
-docs = fetch_docs()
-
-st.sidebar.header("⚙️ Controls")
-
-# Group docs by source
-by_source = {}
-for d in docs:
-    by_source.setdefault(d["source"] or "UNKNOWN", []).append(d)
-
-sources = sorted(by_source.keys())
-source_choice = st.sidebar.selectbox("Filter by Source (optional)", ["ALL"] + sources)
-
-filtered_docs = docs if source_choice == "ALL" else by_source.get(source_choice, [])
-
-doc_label_to_id = {d["display_name"]: d["doc_id"] for d in filtered_docs}
-doc_labels = list(doc_label_to_id.keys())
+doc_label_to_id = {d["display_name"]: d["doc_id"] for d in docs}
 
 selected_doc_labels = st.sidebar.multiselect(
     "Choose documents (optional)",
-    options=doc_labels,
-    help="Leave empty to search ALL documents.",
+    options=list(doc_label_to_id.keys()),
 )
 
-top_k = st.sidebar.slider("Top K chunks", min_value=3, max_value=20, value=8)
+top_k = st.sidebar.slider("Top K chunks", 3, 20, 8)
 strict = st.sidebar.toggle("Strict mode (no guessing)", value=True)
 
-st.sidebar.markdown("---")
-st.sidebar.caption("Tip: For best accuracy, pick 1–3 docs for a question.")
-
-# ---- Main query box ----
-question = st.text_input("Ask your question", placeholder="e.g., What does Charaka say about healthy living?")
+# -----------------------------
+# Main UI
+# -----------------------------
+question = st.text_input(
+    "Ask your question",
+    placeholder="e.g., What does Charaka say about healthy living?",
+)
 
 ask = st.button("✨ Ask", use_container_width=True)
 
@@ -165,57 +86,33 @@ if ask:
         st.warning("Type a question first.")
         st.stop()
 
-    doc_ids = [doc_label_to_id[x] for x in selected_doc_labels]
-
     payload = {
         "question": question.strip(),
-        "top_k": int(top_k),
-        "strict": bool(strict),
+        "top_k": top_k,
+        "strict": strict,
+        "doc_ids": [doc_label_to_id[x] for x in selected_doc_labels],
         "source_filter": None if source_choice == "ALL" else source_choice,
-        "doc_ids": doc_ids if doc_ids else None,
     }
-
-    '''
-    with st.spinner("Thinking with citations..."):
-        r = requests.post(f"{API_BASE}/ask", json=payload, timeout=120)
-
-    if r.status_code != 200:
-        st.error("API error")
-        st.code(r.text)
-        st.stop()
-
-    data = r.json()
-    '''
 
     with st.spinner("Thinking with citations..."):
         data = ask_question(payload)
 
-    # ---- Answer card ----
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader("✅ Answer")
-    st.write(data.get("answer", ""))
+    st.write(data["answer"])
 
-    st.markdown(
-        f'<div class="muted">Retrieved chunks: <b>{data.get("retrieved_count", 0)}</b></div>',
-        unsafe_allow_html=True,
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.caption(f"Retrieved chunks: {data['retrieved_count']}")
 
-    # ---- Citations ----
-    cits = data.get("citations") or []
-    if cits:
+    if data.get("citations"):
         st.subheader("📌 Citations")
-        for c in cits:
-            st.markdown('<div class="card">', unsafe_allow_html=True)
-            st.markdown(f"**{c.get('title','')}**")
+        for c in data["citations"]:
             st.markdown(
-                f"<span class='pill'>{c.get('source','')}</span>"
-                f"<span class='pill'>{c.get('file_name','')}</span>"
-                f"<span class='pill'>Pages {c.get('page_start',0)}–{c.get('page_end',0)}</span>",
-                unsafe_allow_html=True,
+                f"""
+**{c['title']}**
+
+- Source: {c['source']}
+- File: {c['file_name']}
+- Pages: {c['page_start']}–{c['page_end']}
+- Section: {c['section']}
+- Chunk: {c['chunk_id']}
+"""
             )
-            st.caption(f"Section: {c.get('section','')}")
-            st.caption(f"Chunk: {c.get('chunk_id','')}")
-            st.markdown("</div>", unsafe_allow_html=True)
-    else:
-        st.info("No citations returned.")
