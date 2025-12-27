@@ -1,12 +1,57 @@
-import requests
+#import requests
 import streamlit as st
 import streamlit as st
+
+# -----------------------------
+# Local backend replacements
+# -----------------------------
+
+def list_docs():
+    """
+    TEMP stub.
+    Replace later with real vector DB / RAG logic.
+    """
+    return [
+        {
+            "doc_id": "charaka_1",
+            "display_name": "Charaka Samhita – Sutrasthana",
+            "source": "Charaka",
+        },
+        {
+            "doc_id": "ashtanga_1",
+            "display_name": "Ashtanga Hridayam – Sutrasthana",
+            "source": "Ashtanga",
+        },
+    ]
+
+
+def ask_question(payload):
+    """
+    TEMP stub.
+    Replace later with OpenAI + retrieval logic.
+    """
+    return {
+        "answer": f"(Demo answer)\n\nYou asked:\n{payload['question']}",
+        "retrieved_count": 2,
+        "citations": [
+            {
+                "title": "Charaka Samhita",
+                "source": "Charaka",
+                "file_name": "charaka_samhita.pdf",
+                "page_start": 12,
+                "page_end": 13,
+                "section": "Sutrasthana",
+                "chunk_id": "chunk_001",
+            }
+        ],
+    }
+
 
 st.set_page_config(page_title="Ayurvedic LLM")
 st.write("🚀 Ayurvedic LLM starting...")
 
 
-API_BASE = "http://127.0.0.1:8000"
+#API_BASE = "http://127.0.0.1:8000"
 
 st.set_page_config(
     page_title="Ayurveda AI",
@@ -52,13 +97,19 @@ with left:
 with right:
     st.markdown('<div class="card">⚡ Fast • Safe • Cited</div>', unsafe_allow_html=True)
 
+'''
 # ---- Load docs from backend ----
 @st.cache_data(ttl=60)
 def fetch_docs():
     r = requests.get(f"{API_BASE}/list_docs", timeout=20)
     r.raise_for_status()
     return r.json()["docs"]
+'''
+@st.cache_data(ttl=60)
+def fetch_docs():
+    return list_docs()
 
+'''
 docs = []
 docs_error = None
 try:
@@ -73,6 +124,11 @@ if docs_error:
     st.sidebar.error("Backend not reachable or /docs failed.")
     st.sidebar.caption(docs_error)
     st.stop()
+'''
+
+docs = fetch_docs()
+
+st.sidebar.header("⚙️ Controls")
 
 # Group docs by source
 by_source = {}
@@ -119,6 +175,7 @@ if ask:
         "doc_ids": doc_ids if doc_ids else None,
     }
 
+    '''
     with st.spinner("Thinking with citations..."):
         r = requests.post(f"{API_BASE}/ask", json=payload, timeout=120)
 
@@ -128,6 +185,10 @@ if ask:
         st.stop()
 
     data = r.json()
+    '''
+
+    with st.spinner("Thinking with citations..."):
+    data = ask_question(payload)
 
     # ---- Answer card ----
     st.markdown('<div class="card">', unsafe_allow_html=True)
